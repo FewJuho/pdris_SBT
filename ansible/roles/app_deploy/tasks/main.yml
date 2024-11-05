@@ -1,0 +1,30 @@
+---
+- name: Install required packages
+  apk:
+    name: 
+      - python3
+      - py3-pip
+      - git
+    state: present
+
+- name: Clone application repository
+  git:
+    repo: "{{ app_repo }}"
+    dest: /app/src
+    version: "{{ app_version }}"
+  when: app_repo is defined
+
+- name: Copy application files
+  copy:
+    src: /app/
+    dest: /app/dist/
+    remote_src: yes
+  when: app_repo is not defined
+
+- name: Make run script executable
+  file:
+    path: /app/dist/run.sh
+    mode: '0755'
+
+- name: Execute run script
+  command: /app/dist/run.sh

@@ -1,0 +1,9 @@
+all:
+  hosts:
+    app-container:
+      ansible_docker_extra_args: "--tls=false"
+      ansible_connection: docker
+      ansible_python_interpreter: /usr/bin/python3
+      ansible_user: ansible
+      ansible_become: yes
+      ansible_become_method: sudo
