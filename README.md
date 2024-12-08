@@ -1,5 +1,7 @@
 # pdris_SBT
 
-Boot with "docker-compose up --build" in ./
+![фото пруф](./proof_photo.jpg)
 
-web page on flask "https://hub.docker.com/r/apopovprodby/pdris-web" + postgreSQL db (db/init.sql)
+
+
+[видео пруф](https://youtu.be/N5cl-sPllbo)
