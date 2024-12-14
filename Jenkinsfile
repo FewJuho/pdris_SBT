@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'web-app'
         DOCKER_TAG = "${BUILD_NUMBER}"
+        PATH = "$PATH:/var/lib/jenkins/.local/bin"
     }
     
     stages {
@@ -16,9 +17,11 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir('web') {
-                    sh 'pip install -r requirements.txt'
-                    // Установка зависимостей для тестов
-                    sh 'pip install pytest pytest-allure-adaptor'
+                    sh '''
+                        python -m pip install --user --upgrade pip
+                        pip install --user -r requirements.txt
+                        pip install --user pytest allure-pytest
+                    '''
                 }
             }
         }
@@ -26,18 +29,28 @@ pipeline {
         stage('Run Tests') {
             steps {
                 dir('web') {
-                    sh 'pytest --alluredir=allure-results'
+                    sh 'python -m pytest --alluredir=allure-results'
                 }
             }
             post {
                 always {
-                    allure([
-                        includeProperties: false,
-                        jdk: '',
-                        properties: [],
-                        reportBuildPolicy: 'ALWAYS',
-                        results: [[path: 'web/allure-results']]
-                    ])
+                    script {
+                        allure([
+                            includeProperties: false,
+                            jdk: '',
+                            properties: [],
+                            reportBuildPolicy: 'ALWAYS',
+                            results: [[path: 'web/allure-results']]
+                        ])
+                    }
+                }
+            }
+        }
+        
+        stage('Generate Allure Report') {
+            steps {
+                dir('web') {
+                    sh 'allure generate allure-results -c -o allure-report'
                 }
             }
         }
@@ -45,13 +58,13 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh """
+                    sh '''
                         sonar-scanner \
                         -Dsonar.projectKey=web-app \
                         -Dsonar.sources=. \
                         -Dsonar.host.url=${SONAR_HOST_URL} \
                         -Dsonar.login=${SONAR_AUTH_TOKEN}
-                    """
+                    '''
                 }
             }
         }
