@@ -17,7 +17,6 @@ pipeline {
             steps {
                 dir('web') {
                     sh 'pip install -r requirements.txt'
-                    // Установка зависимостей для тестов
                     sh 'pip install pytest pytest-allure-adaptor'
                 }
             }
