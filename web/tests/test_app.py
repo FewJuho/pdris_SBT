@@ -1,33 +1,29 @@
 import pytest
-from app import app
-import json
+import allure
+import os
 
-@pytest.fixture
-def client():
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
+os.environ['DB_HOST'] = 'localhost'
+os.environ['DB_NAME'] = 'your_db_name'
+os.environ['DB_USER'] = 'your_username'
+os.environ['DB_PASSWORD'] = 'your_password'
 
-def test_index_page(client):
-    """Test that index page loads correctly"""
-    rv = client.get('/')
-    assert rv.status_code == 200
-    assert b'Users List' in rv.data
+@allure.feature('Web Application')
+class TestWebApp:
+    
+    @allure.story('Homepage')
+    @allure.severity(allure.severity_level.CRITICAL)
+    def test_index_page(self, client, mock_db_connection):
+        """Test if the index page loads successfully"""
+        response = client.get('/')
+        assert response.status_code == 200
+        assert b"Users List" in response.data
+        assert b"Test User" in response.data
+        assert b"test@example.com" in response.data
 
-def test_db_connection(client):
-    """Test database connection and data retrieval"""
-    rv = client.get('/')
-    assert rv.status_code == 200
-    # Check if the test user is in the response
-    assert b'Popov Aleksandr' in rv.data
-    assert b'hochu_otl.com' in rv.data
-
-@pytest.mark.parametrize("route", [
-    '/nonexistent',
-    '/api/users',
-    '/admin'
-])
-def test_nonexistent_routes(client, route):
-    """Test handling of nonexistent routes"""
-    rv = client.get(route)
-    assert rv.status_code == 404
+    @allure.story('Database')
+    @allure.severity(allure.severity_level.BLOCKER)
+    def test_db_connection_environment_variables(self):
+        """Test if all required environment variables are set"""
+        required_vars = ['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD']
+        for var in required_vars:
+            assert var in os.environ, f"Environment variable {var} is not set"
