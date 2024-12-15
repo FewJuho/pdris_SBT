@@ -1,5 +1,10 @@
 # pdris_SBT
+![](pics/jen1.jpg)
 
-Boot with "docker-compose up --build" in ./
+![](pics/jen2.jpg)
 
-web page on flask "https://hub.docker.com/r/apopovprodby/pdris-web" + postgreSQL db (db/init.sql)
+![](pics/webhook.jpg)
+
+![](pics/photo_2024-12-16_00-52-33.jpg)
+
+![Allure](pics/allure.jpg)
